@@ -3,9 +3,10 @@
 |--------------|------------------------------------------------------------------|
 | **Course**:  | [Reproducible Research](https://class.coursera.org/repdata-004/) |
 | **Student**: | McReyar                                                          |
-| **Date**:    | `r format(Sys.Date(), "%m/%d/%Y")`                               |
+| **Date**:    | 07/11/2014                               |
 <br />
-```{r init, warning = FALSE}
+
+```r
 # load necessary libraries
 library(scales)
 library(data.table)
@@ -13,9 +14,11 @@ library(xtable)
 library(lattice)
 ```
 
+
 ## Loading and preprocessing the data
 If the ZIP-file is not stored in the current directory, it has to be downloaded:
-```{r download}
+
+```r
 ## Download zip if necessary
 if(!file.exists("activity.zip")) {
     download.file("http://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip"
@@ -23,8 +26,14 @@ if(!file.exists("activity.zip")) {
     paste("downloaded:",format(Sys.time(),"%m/%d/%Y %I:%M %p %Z", tz="UTC"))
 }
 ```
+
+```
+## [1] "downloaded: 07/11/2014 03:29 PM UTC"
+```
+
 The data has to be unzipped and read:
-```{r load, results='asis'}
+
+```r
 # unzip and load data
 activity <- data.table(read.csv(unz("activity.zip","activity.csv")
                                ,colClasses = c("integer","Date","integer"))
@@ -33,15 +42,32 @@ print(xtable(summary(activity))
      ,type = "html", include.rownames = FALSE
      )
 ```
+
+<!-- html table generated in R 3.0.2 by xtable 1.7-3 package -->
+<!-- Fri Jul 11 17:29:56 2014 -->
+<TABLE border=1>
+<TR> <TH>     steps </TH> <TH>      date </TH> <TH>    interval </TH>  </TR>
+  <TR> <TD> Min.   :  0.0   </TD> <TD> Min.   :2012-10-01   </TD> <TD> Min.   :   0   </TD> </TR>
+  <TR> <TD> 1st Qu.:  0.0   </TD> <TD> 1st Qu.:2012-10-16   </TD> <TD> 1st Qu.: 589   </TD> </TR>
+  <TR> <TD> Median :  0.0   </TD> <TD> Median :2012-10-31   </TD> <TD> Median :1178   </TD> </TR>
+  <TR> <TD> Mean   : 37.4   </TD> <TD> Mean   :2012-10-31   </TD> <TD> Mean   :1178   </TD> </TR>
+  <TR> <TD> 3rd Qu.: 12.0   </TD> <TD> 3rd Qu.:2012-11-15   </TD> <TD> 3rd Qu.:1766   </TD> </TR>
+  <TR> <TD> Max.   :806.0   </TD> <TD> Max.   :2012-11-30   </TD> <TD> Max.   :2355   </TD> </TR>
+  <TR> <TD> NA's   :2304   </TD> <TD>  </TD> <TD>  </TD> </TR>
+   </TABLE>
+
 As the values of interval range from 0 to 2355 and 100 follows on 55, it seems reasonable to convert the interval to time-format:
-```{r preprocess}
+
+```r
 activity$time <- with(activity
                      ,as.POSIXct((interval %/% 100 * -40 + interval) * 60
                                 ,origin = "1960-01-01", tz="UTC")
                      )
 ```
+
 ## What is mean total number of steps taken per day?
-```{r day, fig.width = 9.4, fig.height = 5}
+
+```r
 # aggregate activity by day and calculate sum of steps
 daySteps <- activity[!is.na(activity$steps)
                     ,list(sum  = sum(steps))
@@ -62,10 +88,14 @@ legend("topright", lwd = 3
       ,col    = c(alpha("blue",0.2), alpha("red" ,0.2))
       )
 ```
-The mean number of steps taken per day is `r format(meanSteps, digits = 2)` and the median is `r format(medianSteps, digits = 2)` - they overlap in the histogram because they are so close together.
+
+![plot of chunk day](figure/day.png) 
+
+The mean number of steps taken per day is 10766 and the median is 10765 - they overlap in the histogram because they are so close together.
 
 ## What is the average daily activity pattern?
-```{r time, fig.width = 9.4, fig.height = 5}
+
+```r
 # aggregate activity by interval/time and calculate average steps
 intervalSteps <- activity[!is.na(activity$steps)
                          ,list(mean = mean(steps))
@@ -87,20 +117,32 @@ axis.POSIXct(1, at=seq(min(intervalSteps$time)
 maxSteps <- intervalSteps$time[which.max(intervalSteps$mean)]
 abline(v = maxSteps, col = alpha("red",0.2), lwd = 3)
 ```
-As highlighted by the red vertical line, activity peaks at the `r format(maxSteps,"%H:%M")`-interval (`r format(max(intervalSteps$mean), digits = 2)` steps in 5 minutes).
+
+![plot of chunk time](figure/time.png) 
+
+As highlighted by the red vertical line, activity peaks at the 08:35-interval (206 steps in 5 minutes).
 
 ## Imputing missing values
 There are serveral days, where all values are missing:
-```{r missing, results='asis'}
+
+```r
 print(
     xtable(
         t(addmargins(table(activity$date[is.na(activity$steps)])))
        ,digits = 0)
     ,include.rownames = FALSE, type = "html")
-
 ```
+
+<!-- html table generated in R 3.0.2 by xtable 1.7-3 package -->
+<!-- Fri Jul 11 17:29:56 2014 -->
+<TABLE border=1>
+<TR> <TH> 2012-10-01 </TH> <TH> 2012-10-08 </TH> <TH> 2012-11-01 </TH> <TH> 2012-11-04 </TH> <TH> 2012-11-09 </TH> <TH> 2012-11-10 </TH> <TH> 2012-11-14 </TH> <TH> 2012-11-30 </TH> <TH> Sum </TH>  </TR>
+  <TR> <TD align="right"> 288 </TD> <TD align="right"> 288 </TD> <TD align="right"> 288 </TD> <TD align="right"> 288 </TD> <TD align="right"> 288 </TD> <TD align="right"> 288 </TD> <TD align="right"> 288 </TD> <TD align="right"> 288 </TD> <TD align="right"> 2304 </TD> </TR>
+   </TABLE>
+
 Therefore using the average of the same day to impute the missing values is not possible. To still account for different activity patterns for different days, the average steps for the same weekday and the same interval is taken to account for missing values:
-```{r impute}
+
+```r
 imputed <- activity
 # add weekday
 imputed$weekday <- as.POSIXlt(imputed$date)[["wday"]]
@@ -112,8 +154,10 @@ imputed <- merge(imputed, avgSteps, by = c("time", "weekday"), all.x = TRUE)
 # use the mean per time and weekday for missing values
 imputed$steps[is.na(imputed$steps)] <- imputed$mean[is.na(imputed$steps)]
 ```
+
 This has an impact on the histogram (the additional frequencies are in a lighter blue):
-```{r dayimp, fig.width = 9.4, fig.height = 5}
+
+```r
 # aggregate imputed activity data by day and calculate sum
 dayStepsImp <- imputed[,list(sum  = sum(steps)), by = date]
 # create histogram
@@ -137,12 +181,15 @@ legend("topright", lwd = c(3,2,3,2), lty = c(1,2,1,2)
       ,legend = c("mean","mean w/o imputing", "median", "median w/o imputing")
       ,col    = rep(c(alpha("blue",0.2), alpha("red" ,0.2)), each = 2)
       )
-
 ```
-As indicated in the histogram, the imputation results in a slight increase of the average steps per day (from `r format(meanSteps, digits = 2)` to `r format(meanStepsImp, digits = 2)`) as well as the median steps per day (from `r format(medianSteps, digits = 2)` to `r format(medianStepsImp, digits = 2)`).
+
+![plot of chunk dayimp](figure/dayimp.png) 
+
+As indicated in the histogram, the imputation results in a slight increase of the average steps per day (from 10766 to 10821) as well as the median steps per day (from 10765 to 11015).
 
 ## Are there differences in activity patterns between weekdays and weekends?
-```{r weekend, fig.width = 9.4, fig.height = 8}
+
+```r
 # add factor-variable for weekend/weekday
 imputed$day <- as.factor(ifelse(imputed$weekday %in% c(0,6), "weekend", "weekday"))
 # aggregate by new factor variable and time/interval
@@ -165,4 +212,7 @@ xyplot(mean ~ time | day
            panel.xyplot(x, y, ...)
        })
 ```
-On weekends the peak at `r format(maxSteps,"%H:%M")` isn't as pronounced and the activity has more variance over the whole day.
+
+![plot of chunk weekend](figure/weekend.png) 
+
+On weekends the peak at 08:35 isn't as pronounced and the activity has more variance over the whole day.
