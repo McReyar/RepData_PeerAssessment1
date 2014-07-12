@@ -117,7 +117,7 @@ imputed <- merge(imputed, avgSteps, by = c("time", "weekday"), all.x = TRUE)
 imputed$steps[is.na(imputed$steps)] <- imputed$mean[is.na(imputed$steps)]
 ```
 This has an impact on the histogram (the additional frequencies are shown in darker blue):
-```{r dayimp, fig.width = 9.4, fig.height = 5}
+```{r dayimp, fig.width = 12, fig.height = 5}
 # aggregate imputed activity data by day and calculate sum
 dayStepsImp <- imputed[,list(sum = sum(steps)), by = date]
 # create histogram

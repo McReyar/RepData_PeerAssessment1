@@ -26,7 +26,7 @@ if(!file.exists("activity.zip")) {
 ```
 
 ```
-## [1] "downloaded: 07/12/2014 10:43 AM UTC"
+## [1] "downloaded: 07/12/2014 10:48 AM UTC"
 ```
 
 The data has to be unzipped and read:
@@ -42,7 +42,7 @@ print(xtable(summary(activity))
 ```
 
 <!-- html table generated in R 3.0.2 by xtable 1.7-3 package -->
-<!-- Sat Jul 12 12:43:17 2014 -->
+<!-- Sat Jul 12 12:48:44 2014 -->
 <TABLE border=1>
 <TR> <TH>     steps </TH> <TH>      date </TH> <TH>    interval </TH>  </TR>
   <TR> <TD> Min.   :  0.0   </TD> <TD> Min.   :2012-10-01   </TD> <TD> Min.   :   0   </TD> </TR>
@@ -139,7 +139,7 @@ print(
 ```
 
 <!-- html table generated in R 3.0.2 by xtable 1.7-3 package -->
-<!-- Sat Jul 12 12:43:17 2014 -->
+<!-- Sat Jul 12 12:48:45 2014 -->
 <TABLE border=1>
 <TR> <TH> 10/01 </TH> <TH> 10/08 </TH> <TH> 11/01 </TH> <TH> 11/04 </TH> <TH> 11/09 </TH> <TH> 11/10 </TH> <TH> 11/14 </TH> <TH> 11/30 </TH> <TH> Sum </TH>  </TR>
   <TR> <TD align="right"> 288 </TD> <TD align="right"> 288 </TD> <TD align="right"> 288 </TD> <TD align="right"> 288 </TD> <TD align="right"> 288 </TD> <TD align="right"> 288 </TD> <TD align="right"> 288 </TD> <TD align="right"> 288 </TD> <TD align="right"> 2304 </TD> </TR>
