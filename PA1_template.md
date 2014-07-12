@@ -1,10 +1,8 @@
 # Peer Assessment 1
-|              |                                                                  |
-|--------------|------------------------------------------------------------------|
 | **Course**:  | [Reproducible Research](https://class.coursera.org/repdata-004/) |
+|--------------|------------------------------------------------------------------|
 | **Student**: | McReyar                                                          |
-| **Date**:    | 07/11/2014                               |
-<br />
+| **Date**:    | 07/12/2014                               |
 
 ```r
 # load necessary libraries
@@ -23,12 +21,12 @@ If the ZIP-file is not stored in the current directory, it has to be downloaded:
 if(!file.exists("activity.zip")) {
     download.file("http://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip"
                  ,destfile = "activity.zip")
-    paste("downloaded:",format(Sys.time(),"%m/%d/%Y %I:%M %p %Z", tz="UTC"))
+    paste("downloaded:", format(Sys.time(),"%m/%d/%Y %I:%M %p %Z", tz = "UTC"))
 }
 ```
 
 ```
-## [1] "downloaded: 07/11/2014 03:29 PM UTC"
+## [1] "downloaded: 07/12/2014 10:43 AM UTC"
 ```
 
 The data has to be unzipped and read:
@@ -44,7 +42,7 @@ print(xtable(summary(activity))
 ```
 
 <!-- html table generated in R 3.0.2 by xtable 1.7-3 package -->
-<!-- Fri Jul 11 17:29:56 2014 -->
+<!-- Sat Jul 12 12:43:17 2014 -->
 <TABLE border=1>
 <TR> <TH>     steps </TH> <TH>      date </TH> <TH>    interval </TH>  </TR>
   <TR> <TD> Min.   :  0.0   </TD> <TD> Min.   :2012-10-01   </TD> <TD> Min.   :   0   </TD> </TR>
@@ -61,7 +59,7 @@ As the values of interval range from 0 to 2355 and 100 follows on 55, it seems r
 ```r
 activity$time <- with(activity
                      ,as.POSIXct((interval %/% 100 * -40 + interval) * 60
-                                ,origin = "1960-01-01", tz="UTC")
+                                ,origin = "1960-01-01", tz = "UTC")
                      )
 ```
 
@@ -80,12 +78,12 @@ hist(daySteps$sum, col = "lightblue3", breaks = 20
 # add vertical lines for mean and median
 meanSteps   <- mean(  daySteps$sum)
 medianSteps <- median(daySteps$sum)
-abline(v = meanSteps,   col = alpha("blue" ,0.2), lwd = 3)
-abline(v = medianSteps, col = alpha("red"  ,0.2), lwd = 3)
+abline(v = meanSteps,   col = alpha("blue", 0.2), lwd = 3)
+abline(v = medianSteps, col = alpha("red" , 0.2), lwd = 3)
 # add legend for mean and median-lines
 legend("topright", lwd = 3
-      ,legend = c("mean","median")
-      ,col    = c(alpha("blue",0.2), alpha("red" ,0.2))
+      ,legend = c("mean", "median")
+      ,col    = c(alpha("blue", 0.2), alpha("red", 0.2))
       )
 ```
 
@@ -110,12 +108,12 @@ with(intervalSteps, plot(time, mean, col = "lightblue3", type = 'l', lwd = 3
                        )
     )
 # create x-axis with correct time format
-axis.POSIXct(1, at=seq(min(intervalSteps$time)
-                      ,max(intervalSteps$time), by="3 hour")
-            ,format="%I:%M %p")
+axis.POSIXct(1, at = seq(min(intervalSteps$time)
+                        ,max(intervalSteps$time), by = "3 hour")
+            ,format = "%I:%M %p")
 # add line for maximum
 maxSteps <- intervalSteps$time[which.max(intervalSteps$mean)]
-abline(v = maxSteps, col = alpha("red",0.2), lwd = 3)
+abline(v = maxSteps, col = alpha("red", 0.2), lwd = 3)
 ```
 
 ![plot of chunk time](figure/time.png) 
@@ -126,17 +124,24 @@ As highlighted by the red vertical line, activity peaks at the 08:35-interval (2
 There are serveral days, where all values are missing:
 
 ```r
+# missing values per day and total missing values
 print(
-    xtable(
-        t(addmargins(table(activity$date[is.na(activity$steps)])))
-       ,digits = 0)
-    ,include.rownames = FALSE, type = "html")
+    xtable(t(addmargins(
+                table(
+                    format(activity$date[is.na(activity$steps)]
+                          ,format = "%m/%d"
+                    )
+           )))
+       ,digits = 0
+    )
+    ,include.rownames = FALSE, type = "html"
+)
 ```
 
 <!-- html table generated in R 3.0.2 by xtable 1.7-3 package -->
-<!-- Fri Jul 11 17:29:56 2014 -->
+<!-- Sat Jul 12 12:43:17 2014 -->
 <TABLE border=1>
-<TR> <TH> 2012-10-01 </TH> <TH> 2012-10-08 </TH> <TH> 2012-11-01 </TH> <TH> 2012-11-04 </TH> <TH> 2012-11-09 </TH> <TH> 2012-11-10 </TH> <TH> 2012-11-14 </TH> <TH> 2012-11-30 </TH> <TH> Sum </TH>  </TR>
+<TR> <TH> 10/01 </TH> <TH> 10/08 </TH> <TH> 11/01 </TH> <TH> 11/04 </TH> <TH> 11/09 </TH> <TH> 11/10 </TH> <TH> 11/14 </TH> <TH> 11/30 </TH> <TH> Sum </TH>  </TR>
   <TR> <TD align="right"> 288 </TD> <TD align="right"> 288 </TD> <TD align="right"> 288 </TD> <TD align="right"> 288 </TD> <TD align="right"> 288 </TD> <TD align="right"> 288 </TD> <TD align="right"> 288 </TD> <TD align="right"> 288 </TD> <TD align="right"> 2304 </TD> </TR>
    </TABLE>
 
@@ -147,7 +152,7 @@ imputed <- activity
 # add weekday
 imputed$weekday <- as.POSIXlt(imputed$date)[["wday"]]
 # aggregate by interval/time and weekday and calculate average steps
-avgSteps <- imputed[,list(mean  = mean(steps,  na.rm = TRUE))
+avgSteps <- imputed[,list(mean = mean(steps,  na.rm = TRUE))
                     ,by = list(time, weekday)]
 # add mean per time and weekday to activity-data
 imputed <- merge(imputed, avgSteps, by = c("time", "weekday"), all.x = TRUE)
@@ -155,19 +160,19 @@ imputed <- merge(imputed, avgSteps, by = c("time", "weekday"), all.x = TRUE)
 imputed$steps[is.na(imputed$steps)] <- imputed$mean[is.na(imputed$steps)]
 ```
 
-This has an impact on the histogram (the additional frequencies are in a lighter blue):
+This has an impact on the histogram (the additional frequencies are shown in darker blue):
 
 ```r
 # aggregate imputed activity data by day and calculate sum
-dayStepsImp <- imputed[,list(sum  = sum(steps)), by = date]
+dayStepsImp <- imputed[,list(sum = sum(steps)), by = date]
 # create histogram
-hist(dayStepsImp$sum, col = "lightblue3", breaks = 20
+hist(dayStepsImp$sum, col = alpha("lightblue4", 0.8), breaks = 20
     ,main = "Frequency of Steps per Day"
     ,xlab = "Total Number of Steps per Day"
     )
 # add barsizes based on data before imputation
-hist(daySteps$sum, col = alpha("lightblue4",0.4), breaks = 20
-    ,add = TRUE, border = NA
+hist(daySteps$sum, col = "lightblue3", breaks = 20
+    ,add = TRUE
     )
 # add vertical lines for mean and median (before and after imputation)
 abline(v = meanSteps,      col = alpha("blue" ,0.2), lwd = 2, lty = 2)
@@ -177,9 +182,14 @@ medianStepsImp <- median(dayStepsImp$sum)
 abline(v = meanStepsImp,   col = alpha("blue" ,0.2), lwd = 3)
 abline(v = medianStepsImp, col = alpha("red"  ,0.2), lwd = 3)
 # add legend for mean and median-lines
-legend("topright", lwd = c(3,2,3,2), lty = c(1,2,1,2)
-      ,legend = c("mean","mean w/o imputing", "median", "median w/o imputing")
-      ,col    = rep(c(alpha("blue",0.2), alpha("red" ,0.2)), each = 2)
+legend("topright", lwd = c(3, 2, 3, 2), lty = c(1, 2, 1, 2)
+      ,legend = c("mean", "mean w/o imputing", "median", "median w/o imputing")
+      ,col    = rep(c(alpha("blue", 0.2), alpha("red", 0.2)), each = 2)
+      )
+# add legend for original / imputed values
+legend("right"
+      ,legend = c("original values", "imputed values")
+      ,fill   = c("lightblue3", alpha("lightblue4", 0.8))
       )
 ```
 
@@ -197,15 +207,15 @@ weekday <- imputed[,list(mean  = mean(steps)), by = list(day,time)]
 # create panel plot
 xyplot(mean ~ time | day
       ,data = weekday
-      ,layout=c(1,2)
+      ,layout = c(1,2)
       ,type = "l", lwd = 3, col = "lightblue3"
       ,main = "Average Number of Steps taken per 5-minute Interval"
       ,xlab = "5-Minute Interval"
-      ,scales=list(x=list(at = seq(min(weekday$time)
-                                  ,to=max(weekday$time)
-                                  ,by="3 hour")
-                         ,format = "%I:%M %p"
-                          )
+      ,scales = list(x = list(at = seq(min(weekday$time)
+                                      ,to = max(weekday$time)
+                                      ,by = "3 hour")
+                             ,format = "%I:%M %p"
+                             )
                   )
       ,ylab = "Average Number of Steps"
       ,panel = function(x, y, ...) {
